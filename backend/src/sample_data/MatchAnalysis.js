@@ -2,23 +2,20 @@ const matchData = require("./matchesData.json");
 const { Router } = require("express");
 const router = Router();
 
-const { Batsman, Bowler, Match } = require("../models/match.model");
+const { Batsman, Bowler } = require("../models/match.model");
 
 router.get("/", async (req, res) => {
   try {
-    let filteredData = {};
-    let bowlers = [];
-    let batsmans = [];
-    for (let i = 0; i < matchData.length; i++) {
-      let year = matchData[i].date.substring(0, 4);
-      let matchId = matchData[i].mid;
+    const filteredData = {};
+    const bowlers = new Set();
+    const batsmans = new Set();
 
-      if (!batsmans.includes(matchData[i].batsman)) {
-        batsmans.push(matchData[i].batsman);
-      }
-      if (!bowlers.includes(matchData[i].bowler)) {
-        bowlers.push(matchData[i].bowler);
-      }
+    matchData.forEach((match) => {
+      const year = match.date.substring(0, 4);
+      const matchId = match.mid;
+
+      batsmans.add(match.batsman);
+      bowlers.add(match.bowler);
 
       if (!filteredData[year]) {
         filteredData[year] = {};
@@ -28,99 +25,90 @@ router.get("/", async (req, res) => {
         filteredData[year][matchId] = [];
       }
 
-      filteredData[year][matchId].push(matchData[i]);
-    }
+      filteredData[year][matchId].push(match);
+    });
 
-    let playersOfbatsman = {};
-    let playersOfBowler = {};
+    const playersOfBatsman = {};
+    const playersOfBowler = {};
 
-    for (let batsman of batsmans) {
-      if (!playersOfbatsman[batsman]) {
-        playersOfbatsman[batsman] = {};
-      }
-    }
-    for (let bowler of bowlers) {
-      if (!playersOfBowler[bowler]) {
-        playersOfBowler[bowler] = {};
-      }
-    }
+    batsmans.forEach((batsman) => {
+      playersOfBatsman[batsman] = {};
+    });
 
-    for (let year of Object.keys(filteredData)) {
-      
-      const yearData = filteredData.year;
-      for (let matchId of Object.keys(yearData)) {
-        let matchArray = yearData.matchId;
-        let prev = 0;
-        let prevWicket = 0;
-        for (let bowls of matchArray) {
-          if (!playersOfbatsman[bowls.batsman][year]) {
-            playersOfbatsman[bowls.batsman][year] = {};
-            playersOfBowler[bowls.bowler][year] = {};
-          }
-          if (!playersOfbatsman[bowls.batsman][year][matchId]) {
-            playersOfbatsman[bowls.batsman][year][matchId] = {};
-            playersOfbatsman[bowls.batsman][year][matchId].bowl = 0;
-            playersOfbatsman[bowls.batsman][year][matchId].runs = 0;
-            playersOfbatsman[bowls.batsman][year][matchId].venue = bowls.venue;
-            playersOfbatsman[bowls.batsman][year][matchId].team =
-              bowls.bat_team;
-            playersOfbatsman[bowls.batsman][year][matchId].against_team =
-              bowls.bowl_team;
-            playersOfbatsman[bowls.batsman][year][matchId].playWithBowlers = {};
-          }
-          playersOfbatsman[bowls.batsman][year][matchId].bowl += 1;
-          playersOfbatsman[bowls.batsman][year][matchId].runs += Number(
-            bowls.runs - prev
-          );
-          if (
-            !playersOfbatsman[bowls.batsman][year][matchId][
-              playWithBowlers
-            ].includes(bowls.bowler)
-          ) {
-            playersOfbatsman[bowls.batsman][year][matchId][
-              playWithBowlers
-            ].push(bowls.bowler);
+    bowlers.forEach((bowler) => {
+      playersOfBowler[bowler] = {};
+    });
+
+    for (const [year, matches] of Object.entries(filteredData)) {
+      for (const [matchId, matchArray] of Object.entries(matches)) {
+        let prevRuns = 0;
+        let prevWickets = 0;
+
+        matchArray.forEach((bowl) => {
+          if (!playersOfBatsman[bowl.batsman][year]) {
+            playersOfBatsman[bowl.batsman][year] = {};
           }
 
-          if (!playersOfBowler[bowls.bowler][year][matchId]) {
-            playersOfBowler[bowls.bowler][year][matchId] = {};
-            playersOfBowler[bowls.bowler][year][matchId].team = bowls.bowl_team;
-            playersOfBowler[bowls.bowler][year][matchId].against_team =
-              bowls.bat_team;
-            playersOfBowler[bowls.bowler][year][matchId].venue = bowls.venue;
-            playersOfBowler[bowls.bowler][year][matchId].wicket = 0;
-            playersOfBowler[bowls.bowler][year][matchId].givesRun = 0;
-            playersOfBowler[bowls.bowler][year][matchId].playWithBatters = {};
+          if (!playersOfBatsman[bowl.batsman][year][matchId]) {
+            playersOfBatsman[bowl.batsman][year][matchId] = {
+              bowl: 0,
+              runs: 0,
+              venue: bowl.venue,
+              team: bowl.bat_team,
+              against_team: bowl.bowl_team,
+              playWithBowlers: [],
+            };
           }
-          playersOfBowler[bowls.bowler][year][matchId].givesRun += Number(
-            bowls.runs - prev
-          );
-          playersOfBowler[bowls.bowler][year][matchId].givesRun += Number(
-            bowls.wickets - prevWicket
-          );
-          if (
-            !playersOfBowler[bowls.bowler][year][matchId][
-              playWithBatters
-            ].includes(bowls.batsman)
-          ) {
-            playersOfBowler[bowls.bowler][year][matchId][playWithBatters].push(
-              bowls.batsman
-            );
+
+          const batsmanStats = playersOfBatsman[bowl.batsman][year][matchId];
+          batsmanStats.bowl += 1;
+          batsmanStats.runs += Number(bowl.runs - prevRuns);
+
+          if (!batsmanStats.playWithBowlers.includes(bowl.bowler)) {
+            batsmanStats.playWithBowlers.push(bowl.bowler);
           }
-          prev = bowls.runs;
-          prevWicket = bowls.wickets;
-        }
+
+          if (!playersOfBowler[bowl.bowler][year]) {
+            playersOfBowler[bowl.bowler][year] = {};
+          }
+
+          if (!playersOfBowler[bowl.bowler][year][matchId]) {
+            playersOfBowler[bowl.bowler][year][matchId] = {
+              team: bowl.bowl_team,
+              against_team: bowl.bat_team,
+              venue: bowl.venue,
+              wicket: 0,
+              givesRun: 0,
+              playWithBatters: [],
+            };
+          }
+
+          const bowlerStats = playersOfBowler[bowl.bowler][year][matchId];
+          bowlerStats.givesRun += Number(bowl.runs - prevRuns);
+          bowlerStats.wicket += Number(bowl.wickets - prevWickets);
+
+          if (!bowlerStats.playWithBatters.includes(bowl.batsman)) {
+            bowlerStats.playWithBatters.push(bowl.batsman);
+          }
+
+          // Update previous values
+          prevRuns = bowl.runs;
+          prevWickets = bowl.wickets;
+        });
       }
     }
 
-    // Save to MongoDB
     await Batsman.deleteMany({});
-    await Batsman.insertMany(playersOfbatsman);
+    const batsmenData = Object.entries(playersOfBatsman).map(([name, stats]) => ({ name, stats }));
+    await Batsman.insertMany(batsmenData);
 
     await Bowler.deleteMany({});
-    await Bowler.insertMany(playersOfBowler);
+    const bowlersData = Object.entries(playersOfBowler).map(([name, stats]) => ({ name, stats }));
+    await Bowler.insertMany(bowlersData);
 
-    res.status(200).json({ message: "Data processed and stored successfully." });
+    res.status(200).json({
+      message: "Data processed and stored successfully.",
+    });
   } catch (error) {
     console.error("Error processing matches:", error);
     res.status(500).json({ error: "An error occurred while processing data." });

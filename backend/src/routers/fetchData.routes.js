@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { Batsman, Bowler, Match } = require("../models/match.model");
+const { Batsman, Bowler } = require("../models/match.model");
 
-// Fetch all batsmen
 router.get("/batsmen", async (req, res) => {
   try {
     const batsmen = await Batsman.find();
@@ -13,7 +12,6 @@ router.get("/batsmen", async (req, res) => {
   }
 });
 
-// Fetch specific batsman by name
 router.get("/batsmen/:name", async (req, res) => {
   try {
     const { name } = req.params;
@@ -26,7 +24,6 @@ router.get("/batsmen/:name", async (req, res) => {
   }
 });
 
-// Fetch all bowlers
 router.get("/bowlers", async (req, res) => {
   try {
     const bowlers = await Bowler.find();
@@ -37,7 +34,6 @@ router.get("/bowlers", async (req, res) => {
   }
 });
 
-// Fetch specific bowler by name
 router.get("/bowlers/:name", async (req, res) => {
   try {
     const { name } = req.params;
