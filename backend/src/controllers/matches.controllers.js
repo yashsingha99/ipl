@@ -4,8 +4,7 @@ const Match = require("../models/match.model");
 
 const search = async (req, res) => {
   try {
-    const { playerName, playerTeam, groundName, matchDate, matchTeam } =
-      req.body;
+    const { playerName, playerTeam, groundName, matchDate, matchTeam } = req.body;
 
     let playerQuery = {};
     let groundQuery = {};

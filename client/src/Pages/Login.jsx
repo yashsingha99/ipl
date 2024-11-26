@@ -3,15 +3,12 @@ import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { Login as LoginUser } from "../api/user.api";
 import { useForm } from "react-hook-form";
-import { useContext } from "react";
-import { AuthContext } from "../Context";
 
 const Login = () => {
   const { register, handleSubmit, reset, setError, formState: { errors } } = useForm();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login } = useContext(AuthContext);
 
   const handleLogin = async (data) => {
     // Check if username contains spaces
@@ -23,7 +20,6 @@ const Login = () => {
     try {
       const res = await LoginUser(data);
       // console.log(data);
-      login();
       if (res.status === 200) {
         alert("Successfully logged in");
         navigate("/");
@@ -34,7 +30,7 @@ const Login = () => {
       console.log(error);
     }
     reset();
-  };
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 via-blue-300 to-purple-200">

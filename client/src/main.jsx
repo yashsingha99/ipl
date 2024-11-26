@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import ReactDOM from "react-dom/client";
+import Cookies from "js-cookie";
 import {
   Route,
   RouterProvider,
@@ -12,21 +13,23 @@ import Registration from "./Pages/Registration.jsx";
 import Profile from "./Pages/Profile.jsx";
 import Contact from "./Pages/contact.jsx";
 import Home from "./Pages/Home.jsx";
-import Matches from "./Pages/Matches.jsx";
 import Venues from "./Pages/Venues.jsx";
 import Team from "./Pages/Team.jsx";
+import Search from "./Pages/Search.jsx";
 import Logout from "./Pages/Logout.jsx";
 import Tables from "./Pages/Tables.jsx";
 import Players from "./Pages/Players.jsx";
+import BatterYearStats from "./Pages/BatterYearStats.jsx";
 import SinglePlayer from "./Pages/SinglePlayer.jsx";
 import SingleGround from "./Pages/SingleGround.jsx";
 import App from "./App.jsx";
 import "./index.css";
-import { AuthProvider, AuthContext } from "./Context.jsx";
+// import { AuthProvider, AuthContext } from "./Context.jsx";
 
 const ProtectedRoute = ({ element }) => {
-  const { isAuthenticated } = useContext(AuthContext);
-  return isAuthenticated ? element : <Navigate to="/login" replace />;
+  // const { isAuthenticated } = useContext(AuthContext);
+  let token = Cookies.get("user");
+  return token ? element : <Navigate to="/login" replace />;
 };
 
 const router = createBrowserRouter(
@@ -44,11 +47,8 @@ const router = createBrowserRouter(
         path="/contact"
         element={<ProtectedRoute element={<Contact />} />}
       />
-      <Route
-        path="/matches"
-        element={<ProtectedRoute element={<Matches />} />}
-      />
       <Route path="/venues" element={<ProtectedRoute element={<Venues />} />} />
+      <Route path="/search" element={<ProtectedRoute element={<Search />} />} />
       <Route
         path="/venues/:id"
         element={<ProtectedRoute element={<SingleGround />} />}
@@ -63,14 +63,16 @@ const router = createBrowserRouter(
         path="/player/:id"
         element={<ProtectedRoute element={<SinglePlayer />} />}
       />
+      <Route
+        path="/:batter/:id/stats/:year"
+        element={<ProtectedRoute element={<BatterYearStats />} />}
+      />
     </Route>
   )
 );
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AuthProvider>
       <RouterProvider router={router} />
-    </AuthProvider>
   </React.StrictMode>
 );

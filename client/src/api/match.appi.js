@@ -1,7 +1,7 @@
 const URI = "http://localhost:5000"
 import axios from "axios"
 
-exports.getAllBatters = async () => {
+export const getAllBatters = async () => {
     try {
         const res = axios.get(`${URI}/api/fetchMatch/batsmen`);
         return res;
@@ -9,7 +9,7 @@ exports.getAllBatters = async () => {
         console.log(error);
     }
 }
-exports.getAllBowlers = async () => {
+export const getAllBowlers = async () => {
     try {
         const res = axios.get(`${URI}/api/fetchMatch/bowlers`);
         return res;

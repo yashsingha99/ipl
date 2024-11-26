@@ -75,7 +75,7 @@ const Home = () => {
       logo: dc,
     },
   ];
-  
+
   const videos = [
     {
       title: "TATA IPL 2024: Top Moments",
@@ -110,7 +110,7 @@ const Home = () => {
         "https://www.youtube.com/embed/9vz_0iVNTs0?autoplay=1&mute=1&controls=0&modestbranding=1&showinfo=0&rel=0&loop=1&playlist=9vz_0iVNTs0",
     },
   ];
-  `                                         `
+  `                                         `;
   const images = [
     "https://static.toiimg.com/thumb/msid-99552788,width-1070,height-580,imgsize-212544,resizemode-75,overlay-toi_sw,pt-32,y_pad-40/photo.jpg",
     "https://akm-img-a-in.tosshub.com/indiatoday/images/story/202008/mumbai-indians-fb-2.jpeg?size=690:388",
@@ -212,26 +212,18 @@ const Home = () => {
       <div className="table bg-blue-950 text-white">
         <h2>What Are You Looking For?</h2>
         <div className="options">
-            <Link className="link" to="/teams">
-          <div className="option">
-              All Teams
-          </div>
-            </Link>
-            <Link className="link" to="/matches">
-          <div className="option">
-              Matches
-          </div>
-            </Link>
-            <Link className="link" to="/venues">
-          <div className="option">
-              Venues
-          </div>
-            </Link>
-            <Link className="link" to="/players">
-          <div className="option">
-              Players
-          </div>
-            </Link>
+          <Link className="link" to="/teams">
+            <div className="option">All Teams</div>
+          </Link>
+          <Link className="link" to="/search">
+            <div className="option">Search</div>
+          </Link>
+          <Link className="link" to="/venues">
+            <div className="option">Venues</div>
+          </Link>
+          <Link className="link" to="/players">
+            <div className="option">Players</div>
+          </Link>
         </div>
       </div>
       <div className="c mx-auto p-2">
