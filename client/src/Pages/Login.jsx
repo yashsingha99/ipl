@@ -11,7 +11,6 @@ const Login = () => {
 
 
   const handleLogin = async (data) => {
-    // Check if username contains spaces
     if (/\s/.test(data.username)) {
       setError("username", { type: "manual", message: "Invalid username" });
       return;

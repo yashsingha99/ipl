@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { getAllBatters, getAllBowlers } from "../api/match.appi";
+import CricketChart from "./CricketChart";
 
 const BatterYearStats = () => {
   const location = useLocation();
@@ -30,7 +31,7 @@ const BatterYearStats = () => {
         );
 
         setStats(playerStats[0]?.stats[year]);
-        // console.log(stats);
+        console.log(stats);
         setPlayerName(playerStats[0]?.name || "Player"); // Update to use player's name
       } catch (error) {
         setError("Error fetching stats");
@@ -61,6 +62,7 @@ const BatterYearStats = () => {
 
   return (
     <div className="p-4">
+     <CricketChart data={stats} /> 
       <h3 className="font-bold text-xl text-gray-800 mb-4 text-center">
         {playerName} Stats ({year})
       </h3>
